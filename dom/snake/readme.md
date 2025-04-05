@@ -1,0 +1,5 @@
+- randomly popping balls | COMPLETED
+- movable snake
+- controllable snake
+- snake height should increase
+- lost if touched border

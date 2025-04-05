@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    Hello
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js'
+
+        // import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFQI8gL7G3rC1ZKJCtep1Owd6uwLUiAso",
+            authDomain: "smit-13-test.firebaseapp.com",
+            projectId: "smit-13-test",
+            storageBucket: "smit-13-test.firebasestorage.app",
+            messagingSenderId: "833923891649",
+            appId: "1:833923891649:web:6f17c563de9d0a73ccaf40"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app)
+        const userCollection = collection(db, "user")
+        addDoc(userCollection, {
+            name: "Ada",
+        }).then((v) => {
+            console.log(v)
+        })
+        console.log(db, "===db")
+    </script>
+</body>
+
+</html>
