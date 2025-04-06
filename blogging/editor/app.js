@@ -1,9 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
 
 //#1 blog and save button
 const saveDataBtn = document.getElementById("save-data")
 const blog = document.getElementById("blog")
+let authorId = ""
 
 let editFlag = false
 
@@ -22,8 +24,6 @@ const blogCollectionRef = collection(db, "blogs")
 let activeBlog = null
 // Save Data
 const saveData = async () => {
-    console.log(editFlag);
-
     // add logic
     if (!editFlag) {
         // add hnga data
@@ -35,6 +35,7 @@ const saveData = async () => {
             title,
             description,
             author,
+            authorId,
             publishedAt: currentDate.toISOString()
         }
         await addDoc(blogCollectionRef, payload)
@@ -53,6 +54,7 @@ const saveData = async () => {
             title,
             description,
             author,
+            authorId,
             updatedAt: currentDate.toISOString()
         }
         await updateDoc(docRef, payload)
@@ -68,7 +70,8 @@ saveDataBtn.addEventListener("click", saveData)
 // Fetch and Show data
 const fetchData = async () => {
     try {
-        const data = await getDocs(blogCollectionRef)
+        const queryRef = query(blogCollectionRef, where("authorId", "==", authorId))
+        const data = await getDocs(queryRef)
         return data
     }
     catch (e) {
@@ -99,7 +102,7 @@ async function showData() {
         blog.innerHTML += card
     })
 }
-showData()
+
 
 // Delete Data
 const deleteBlog = async (id) => {
@@ -125,3 +128,17 @@ const updateBlog = async (id) => {
     activeBlog = id
 }
 window.onUpdate = updateBlog
+
+const auth = getAuth(app);
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        authorId = user.uid
+        showData()
+    }
+    else {
+        authorId = ""
+        location.href = "/blogging/auth/sign-in.html"
+    }
+
+    console.log(authorId, "=idddd")
+});

@@ -44,7 +44,6 @@ async function showData() {
         const parsedData = doc.data()
         const card = createCard(parsedData, doc.id)
         blog.innerHTML += card
-        console.log(card)
     })
 }
 
