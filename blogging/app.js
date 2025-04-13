@@ -11,14 +11,13 @@ const firebaseConfig = {
     appId: "1:833923891649:web:a8717788e7172a18ccaf40"
 };
 
-
 const app = initializeApp(firebaseConfig);
 const dbRef = getFirestore(app)
-const blogRef = collection(dbRef, "blogs")
+const blogCollectionRef = collection(dbRef, "blogs")
 
 const fetchData = async () => {
     try {
-        const data = await getDocs(blogRef)
+        const data = await getDocs(blogCollectionRef)
         return data
     }
     catch (e) {
