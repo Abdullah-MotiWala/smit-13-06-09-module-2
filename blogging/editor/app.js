@@ -18,10 +18,11 @@ import {
 //#1 blog and save button
 const saveDataBtn = document.getElementById("save-data");
 const blog = document.getElementById("blog");
+const getImageButton = document.getElementById("get-image");
 const fileInput = document.getElementById("file");
 
 let authorId = "";
-
+let thumbnailImage = null;
 let editFlag = false;
 
 //#2 configs and references
@@ -51,6 +52,7 @@ const saveData = async () => {
       description,
       author,
       authorId,
+      thumbnailImage,
       publishedAt: currentDate.toISOString(),
     };
     await addDoc(blogCollectionRef, payload);
@@ -70,6 +72,7 @@ const saveData = async () => {
       description,
       author,
       authorId,
+      thumbnailImage,
       updatedAt: currentDate.toISOString(),
     };
     await updateDoc(docRef, payload);
@@ -94,11 +97,12 @@ const fetchData = async () => {
     console.log(e);
   }
 };
-function createCard(cardDetail, id) {
-  const { imgLink, title, description, author, publishedAt } = cardDetail;
+function createCard(cardDetail, imgUrl, id) {
+  const { title, description, author, publishedAt } = cardDetail;
   const descriptionLimit = 50;
+  console.log(imgUrl, "===imgURL");
   const card = `<div class="card">
-    <img src=${imgLink}/>
+    <img src="${imgUrl}" />
     <h2>${title}</h2>
     <p>${description.slice(0, descriptionLimit)}...</p>
     <h5>${author}</h5>
@@ -114,7 +118,8 @@ async function showData() {
   const data = await fetchData();
   data.forEach((doc) => {
     const parsedData = doc.data();
-    const card = createCard(parsedData, doc.id);
+    const imgURL = onGetImage(parsedData.thumbnailImage);
+    const card = createCard(parsedData, imgURL, doc.id);
     // if(parsedData.authorId === authorId){
     blog.innerHTML += card;
     // }
@@ -168,12 +173,25 @@ const sbClient = supabase.createClient(URL, ANON_KEY);
 
 async function onFileChange(e) {
   const file = e.target.files[0];
-  console.log(file, "File Changed");
-  const res = await sbClient
-    .storage
-    .from("smit")
-    .upload("public/abc.png", file);
-  console.log(res, "===res");
+  const { name: fileName } = file;
+  const randomNumber = Math.random();
+  const timeStamp = new Date().getTime();
+
+  const newFileName = `${randomNumber}-${timeStamp}-${fileName}`;
+  const res = await sbClient.storage
+    .from("users")
+    .upload(`public/${newFileName}`, file);
+
+  thumbnailImage = res.data.fullPath;
+}
+
+function onGetImage(filePath) {
+  // const { data } = sbClient.storage
+  //   .from("users")
+  //   .getPublicUrl("public/abc.png");
+  if (!filePath) return "";
+  const imageUrl = `${URL}/storage/v1/object/public/${filePath}`;
+  return imageUrl;
 }
 
 fileInput.addEventListener("change", onFileChange);
